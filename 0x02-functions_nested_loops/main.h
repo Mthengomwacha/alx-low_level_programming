@@ -2,7 +2,7 @@
 #define MAIN.H
 
 void print_alphabet(void);
-print_alphabet_x10(void);
+void print_alphabet_x10(void);
 int islower(int c);
 int _putchar(char c);
 int isalpha(int c);
