@@ -5,3 +5,4 @@ char **strtow(char *str);
 char *argstostr(int ac, char **av);
 int **alloc_grid(int width, int height);
 char *create_array(unsigned int size, char c);
+int _putchar(char c);
