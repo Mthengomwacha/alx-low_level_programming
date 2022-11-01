@@ -1,58 +1,48 @@
 #include "main.h"
-void closer(int arg_files);
 /**
- * main - Entry Point
- * @argc: # of args
- * @argv: array pointer for args
- * Return: 0
+*error_wr - detect error in write or read
+*@fdr: result of open file to read
+*@fdw: result of open file to write
+*@file_from: file from copy
+*@file_to: file to copy
+*/
+void error_wr(int fdr, int fdw, char *file_from, char *file_to)
+{
+	ssize_t r, w;
+	char buf[NBYTES];
+
+	do {
+		r = read(fdr, buf, NBYTES);
+		if (r == -1)
+		{
+			dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", file_from);
+			exit(98);
+		}
+		if (r)
+		{
+			w = write(fdw, buf, r);
+			if (w != r)
+			{
+				dprintf(STDERR_FILENO, "Error: Can't write to %s\n", file_to);
+				exit(99);
+			}
+		}
+	} while (r);
+}
+/**
+ * main - copy content of one file into another
+ * @argc: count of arguments
+ * @argv: array of arguments
+ *
+ * Return: EXIT_SUCCESS on success or exit with error number.
  */
 int main(int argc, char *argv[])
 {
-	int file_from, file_to, file_from_r, wr_err;
-	char buf[1024];
+	char *file_from, *file_to;
+	int fdr, fdw;
 
 	if (argc != 3)
 	{
-		dprintf(2, "Usage: cp file_from file_to\n");
+		dprintf(STDERR_FILENO, "Usage: cp file_from file_to\n");
 		exit(97);
-	}
-
-	file_from = open(argv[1], O_RDONLY);
-	if (file_from == -1)
-	{
-		dprintf(2, "Error: Can't read from file %s\n", argv[1]);
-		exit(98);
-	}
-
-	file_to = open(argv[2], O_WRONLY | O_TRUNC | O_CREAT, 0664);
-	if (file_to == -1)
-	{
-		dprintf(2, "Error: Can't write to %s\n", argv[2]);
-		exit(99);
-	}
-
-	while (file_from_r >= 1024)
-	{
-		file_from_r = read(file_from, buf, 1024);
-		if (file_from_r == -1)
-		{
-			dprintf(2, "Error: Can't read from file %s\n", argv[1]);
-			closer(file_from);
-			closer(file_to);
-			exit(98);
-		}
-		wr_err = write(file_to, buf, file_from_r);
-		if (wr_err == -1)
-		{
-			dprintf(2, "Error: Can't write to %s\n", argv[2]);
-			exit(99);
-		}
-	}
-
-	closer(file_from);
-	closer(file_to);
-	return (0);
-}
-
-/**
 
